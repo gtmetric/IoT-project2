@@ -1,0 +1,171 @@
+[
+    {
+        "id": "e6ed8a49.34ead",
+        "type": "tab",
+        "label": "Node-RED",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "30a983c6.f15eac",
+        "type": "camera",
+        "z": "e6ed8a49.34ead",
+        "name": "Camera",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "b7ab82ff.b1a338",
+                "990f49cc.99ebf8"
+            ]
+        ]
+    },
+    {
+        "id": "b7ab82ff.b1a338",
+        "type": "image viewer",
+        "z": "e6ed8a49.34ead",
+        "name": "Original Image viewer",
+        "width": "320",
+        "data": "payload",
+        "dataType": "msg",
+        "x": 360,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e0a513ae.0c3ff8",
+        "type": "image viewer",
+        "z": "e6ed8a49.34ead",
+        "name": "With bounding boxes",
+        "width": "320",
+        "data": "payload",
+        "dataType": "msg",
+        "x": 680,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "41a6b3d.e80f0cc",
+        "type": "bbox-image",
+        "z": "e6ed8a49.34ead",
+        "strokeWidth": "4",
+        "fontSize": "16",
+        "objectsProp": "payload",
+        "objectsPropType": "msg",
+        "imageProp": "image",
+        "imagePropType": "msg",
+        "name": "bounding-box",
+        "x": 440,
+        "y": 400,
+        "wires": [
+            [
+                "e0a513ae.0c3ff8",
+                "454dcb266e7591a7"
+            ]
+        ]
+    },
+    {
+        "id": "dd280bb2.d6681",
+        "type": "post-object-detection",
+        "z": "e6ed8a49.34ead",
+        "classesURL": "https://s3.sjc.us.cloud-object-storage.appdomain.cloud/tfjs-cos/cocossd/classes.json",
+        "iou": "0.5",
+        "minScore": "0.5",
+        "name": "post-processing",
+        "x": 220,
+        "y": 400,
+        "wires": [
+            [
+                "41a6b3d.e80f0cc",
+                "34bed9b6da8d900a"
+            ]
+        ]
+    },
+    {
+        "id": "990f49cc.99ebf8",
+        "type": "tf-function",
+        "z": "e6ed8a49.34ead",
+        "name": "pre-processing",
+        "func": "const image = tf.tidy(() => {\n  return tf.node.decodeImage(msg.payload, 3).expandDims(0);\n});\n\nmsg.image = msg.payload;\nmsg.payload = { image_tensor: image }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 340,
+        "y": 220,
+        "wires": [
+            [
+                "995f6de8.b48258"
+            ]
+        ]
+    },
+    {
+        "id": "995f6de8.b48258",
+        "type": "tf-model",
+        "z": "e6ed8a49.34ead",
+        "modelURL": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json",
+        "outputNode": "",
+        "name": "COCO SSD lite",
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "dd280bb2.d6681"
+            ]
+        ]
+    },
+    {
+        "id": "34bed9b6da8d900a",
+        "type": "function",
+        "z": "e6ed8a49.34ead",
+        "name": "person-detected",
+        "func": "if (msg.payload[0] && msg.payload[0].className==='person') {\n    msg.payload = 'Person detected'\n} else {\n    msg.payload = false;\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 520,
+        "wires": [
+            [
+                "dcb3c8adaa5b9248"
+            ]
+        ]
+    },
+    {
+        "id": "dcb3c8adaa5b9248",
+        "type": "debug",
+        "z": "e6ed8a49.34ead",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "454dcb266e7591a7",
+        "type": "debug",
+        "z": "e6ed8a49.34ead",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "image",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 520,
+        "wires": []
+    }
+]
