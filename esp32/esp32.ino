@@ -25,8 +25,8 @@ const int D5 = 13;
 const int D6 = 12;
 const int D7 = 26;
 
-#define ssid1        "Chimpanzee"
-#define password1    "12346780"
+#define ssid        "Chimpanzee"
+#define password    "12346780"
 OV7670 *camera;
 WiFiMulti wifiMulti;
 WiFiServer server(80);
@@ -56,7 +56,9 @@ void IRAM_ATTR isr();
 // serve() returns the response to client HTTP requests
 void serve()
 {
+  Serial.print("Client available: ");
   WiFiClient client = server.available();
+  Serial.println(client);
   
   if (client) {
     String currentLine = "";
@@ -100,7 +102,7 @@ void serve()
         }
 
         // Return camera frames to the GET /camera request
-        if(currentLine.endsWith("GET /camera")) {
+        if(currentLine.endsWith("GET /camera") and cameraOn) {
             client.println("HTTP/1.1 200 OK");
             client.println("Content-type:image/bmp");
             client.println();
@@ -124,7 +126,7 @@ void setup() {
   Serial.begin(115200);
 
   // Camera & Server Setup
-  wifiMulti.addAP(ssid1, password1);
+  wifiMulti.addAP(ssid, password);
   Serial.println("Connecting Wifi...");
   if(wifiMulti.run() == WL_CONNECTED) {
       Serial.println("");
@@ -181,7 +183,8 @@ void loop() {
     camera->oneFrame();
   }
   serve();
-  delay(100);
+  Serial.println("Served");
+  delay(1000);
 }
 
 // Detect interrupt
