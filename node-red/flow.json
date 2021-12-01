@@ -7,47 +7,6 @@
         "info": ""
     },
     {
-        "id": "70c5862df42e7bcb",
-        "type": "mqtt-broker",
-        "name": "NETPIE",
-        "broker": "broker.netpie.io",
-        "port": "1883",
-        "clientid": "",
-        "autoConnect": true,
-        "usetls": false,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "birthMsg": {},
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "closeMsg": {},
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": "",
-        "willMsg": {},
-        "sessionExpiry": ""
-    },
-    {
-        "id": "b7ab82ff.b1a338",
-        "type": "image viewer",
-        "z": "e6ed8a49.34ead",
-        "name": "Original Image viewer",
-        "width": "320",
-        "data": "payload",
-        "dataType": "msg",
-        "active": true,
-        "x": 540,
-        "y": 80,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "e0a513ae.0c3ff8",
         "type": "image viewer",
         "z": "e6ed8a49.34ead",
@@ -57,7 +16,7 @@
         "dataType": "msg",
         "active": true,
         "x": 320,
-        "y": 520,
+        "y": 600,
         "wires": [
             []
         ]
@@ -74,7 +33,7 @@
         "imagePropType": "msg",
         "name": "bounding-box",
         "x": 300,
-        "y": 440,
+        "y": 520,
         "wires": [
             [
                 "963e14d69cfde291",
@@ -91,7 +50,7 @@
         "minScore": "0.5",
         "name": "post-processing",
         "x": 300,
-        "y": 360,
+        "y": 440,
         "wires": [
             [
                 "41a6b3d.e80f0cc",
@@ -108,7 +67,7 @@
         "outputs": 1,
         "noerr": 0,
         "x": 300,
-        "y": 200,
+        "y": 280,
         "wires": [
             [
                 "995f6de8.b48258"
@@ -123,7 +82,7 @@
         "outputNode": "",
         "name": "COCO SSD lite",
         "x": 300,
-        "y": 280,
+        "y": 360,
         "wires": [
             [
                 "dd280bb2.d6681"
@@ -142,7 +101,7 @@
         "finalize": "",
         "libs": [],
         "x": 530,
-        "y": 360,
+        "y": 440,
         "wires": [
             [
                 "d5ce8b568c989c7b"
@@ -157,7 +116,7 @@
         "method": "GET",
         "ret": "bin",
         "paytoqs": "ignore",
-        "url": "https://static.remove.bg/remove-bg-web/a76316286d09b12be1ebda3b400e3f44716c24d0/assets/start-1abfb4fe2980eabfbbaaa4365a0692539f7cd2725f324f904565a9a744f8e214.jpg",
+        "url": "http://192.168.1.125/camera",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -167,8 +126,7 @@
         "y": 120,
         "wires": [
             [
-                "b7ab82ff.b1a338",
-                "990f49cc.99ebf8"
+                "a75321f1c2b14630"
             ]
         ]
     },
@@ -217,8 +175,8 @@
         "drop": true,
         "allowrate": false,
         "outputs": 1,
-        "x": 680,
-        "y": 680,
+        "x": 1200,
+        "y": 520,
         "wires": [
             [
                 "5df59d9495029495"
@@ -239,8 +197,8 @@
         "proxy": "",
         "authType": "bearer",
         "senderr": false,
-        "x": 670,
-        "y": 840,
+        "x": 1050,
+        "y": 680,
         "wires": [
             [
                 "00384d1ff1ad1ed5"
@@ -260,8 +218,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 870,
-        "y": 800,
+        "x": 1250,
+        "y": 680,
         "wires": []
     },
     {
@@ -279,8 +237,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 680,
-        "y": 600,
+        "x": 980,
+        "y": 520,
         "wires": [
             [
                 "bbd25f19cd863ad3"
@@ -292,18 +250,18 @@
         "type": "function",
         "z": "e6ed8a49.34ead",
         "name": "Message",
-        "func": "msg.headers = {\n    \"Content-Type\": \"multipart/form-data\"\n};\nmsg.payload = {\n    \"message\": \"A person is detected.\",\n    \"imageFile\": msg.payload.imageFile\n};\n\nreturn msg;",
+        "func": "msg.headers = {\n    \"Content-Type\": \"multipart/form-data\"\n};\nvar date = new Date().toISOString();\ndate = date.substring(0, 10).replaceAll('-', '/') + '-' + date.substring(11, 16);\nmsg.payload = {\n    \"message\": \"[\"+date+\"] We saw someone. Take a look at the monitor.\\n192.168.1.125\",\n    \"imageFile\": msg.payload.imageFile,\n    \"stickerPackageId\": \"1\",\n    \"stickerId\": \"113\"\n};\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 660,
-        "y": 760,
+        "x": 1040,
+        "y": 600,
         "wires": [
             [
-                "00384d1ff1ad1ed5",
-                "bf3a1ff87f8827ff"
+                "bf3a1ff87f8827ff",
+                "7f4de1b90e6bd93e"
             ]
         ]
     },
@@ -327,8 +285,8 @@
         "reduceInit": "",
         "reduceInitType": "",
         "reduceFixup": "",
-        "x": 690,
-        "y": 440,
+        "x": 790,
+        "y": 520,
         "wires": [
             [
                 "5f3e38963d2e4ede"
@@ -346,8 +304,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 780,
-        "y": 520,
+        "x": 800,
+        "y": 600,
         "wires": [
             [
                 "d5ce8b568c989c7b"
@@ -396,8 +354,8 @@
                 }
             ]
         },
-        "x": 580,
-        "y": 520,
+        "x": 600,
+        "y": 600,
         "wires": [
             [
                 "2e08db6be3854aee"
@@ -452,11 +410,94 @@
             ]
         },
         "x": 500,
-        "y": 440,
+        "y": 520,
         "wires": [
             [
                 "e90c3838f3dd6c99"
             ]
         ]
+    },
+    {
+        "id": "b7ab82ff.b1a338",
+        "type": "image viewer",
+        "z": "e6ed8a49.34ead",
+        "name": "Original Image viewer",
+        "width": "320",
+        "data": "payload",
+        "dataType": "msg",
+        "active": true,
+        "x": 540,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a75321f1c2b14630",
+        "type": "jimp-image",
+        "z": "e6ed8a49.34ead",
+        "name": "covert to png",
+        "data": "payload",
+        "dataType": "msg",
+        "ret": "buf",
+        "parameter1": "raw.png",
+        "parameter1Type": "str",
+        "parameter2": "",
+        "parameter2Type": "msg",
+        "parameter3": "",
+        "parameter3Type": "msg",
+        "parameter4": "",
+        "parameter4Type": "msg",
+        "parameter5": "",
+        "parameter5Type": "msg",
+        "parameter6": "",
+        "parameter6Type": "msg",
+        "parameter7": "",
+        "parameter7Type": "msg",
+        "parameter8": "",
+        "parameter8Type": "msg",
+        "sendProperty": "payload",
+        "sendPropertyType": "msg",
+        "parameterCount": 1,
+        "jimpFunction": "write",
+        "selectedJimpFunction": {
+            "name": "write",
+            "fn": "write",
+            "description": "Write to file. NOTE: You can specify an alternative file extension type to change the type. Currently support types are jpg, png, bmp.",
+            "parameters": [
+                {
+                    "name": "filename",
+                    "type": "str",
+                    "required": true,
+                    "hint": "Name of the file",
+                    "defaultType": "str"
+                }
+            ]
+        },
+        "x": 300,
+        "y": 200,
+        "wires": [
+            [
+                "990f49cc.99ebf8",
+                "b7ab82ff.b1a338"
+            ]
+        ]
+    },
+    {
+        "id": "7f4de1b90e6bd93e",
+        "type": "debug",
+        "z": "e6ed8a49.34ead",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 600,
+        "wires": []
     }
 ]
