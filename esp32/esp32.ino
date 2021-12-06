@@ -48,10 +48,32 @@ unsigned int colour = red << 11; // Colour order is RGB 5+6+5 bits each
 /*----------------------------------------------------*/
 // Switch + Interrupt Initialization
 #define SW 5
-volatile bool cameraOn;
+RTC_DATA_ATTR bool cameraOn = true;
 volatile bool intFlag;
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 void IRAM_ATTR isr();
+
+// RTC Initialization
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in seconds) */
+#define AWAKE_TIME 5
+RTC_DATA_ATTR int bootCount = 0;
+
+void print_wakeup_reason(){
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
+    case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
+    default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
+  }
+}
 
 // serve() returns the response to client HTTP requests
 void serve()
@@ -117,15 +139,36 @@ void serve()
   }  
 }
 
-void setup() {
+void setup(){
+  Serial.begin(115200);
+  delay(1000); //Take some time to open up the Serial Monitor
+
+  //Increment boot number and print it every reboot
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+
+  //Print the wakeup reason for ESP32
+  print_wakeup_reason();
+
+  /*
+  We set our ESP32 to wake up every 5 seconds
+  */
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  Serial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) +
+  " Seconds");
+
+  /*
+  Shut down the peripherals
+  */
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_AUTO);
+  Serial.println("Configured all RTC Peripherals to be powered down in sleep");
+
   // Switch + Interrupt Setup
   pinMode(SW, INPUT);
   attachInterrupt(digitalPinToInterrupt(SW), isr, FALLING);
-  cameraOn = true;
   intFlag = false;
-  Serial.begin(115200);
 
-  // Camera & Server Setup
+  // Server Setup
   wifiMulti.addAP(ssid, password);
   Serial.println("Connecting Wifi...");
   if(wifiMulti.run() == WL_CONNECTED) {
@@ -134,43 +177,58 @@ void setup() {
       Serial.println("IP address: ");
       Serial.println(WiFi.localIP());
   }
-  camera = new OV7670(OV7670::Mode::QQVGA_RGB565, SIOD, SIOC, VSYNC, HREF, XCLK, PCLK, D0, D1, D2, D3, D4, D5, D6, D7);
-  BMP::construct16BitHeader(bmpHeader, camera->xres, camera->yres);
-  server.begin();
 
   // LCD Setup
   tft.init();
   tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
   tft.setTextSize(10);
-  tft.setCursor(120, 100);
-  tft.setTextColor(TFT_WHITE);
-  tft.println("ON");
+  if(cameraOn) {
+    tft.setCursor(120, 100);
+    tft.println("ON");
+  }
+  else {
+    tft.setCursor(100, 100);
+    tft.println("OFF");
+  }
   targetTime = millis() + 1000;
+  Serial.print("Camera: ");
+  Serial.println(cameraOn);
+
+  // Camera Setup
+  camera = new OV7670(OV7670::Mode::QQVGA_RGB565, SIOD, SIOC, VSYNC, HREF, XCLK, PCLK, D0, D1, D2, D3, D4, D5, D6, D7);
+  BMP::construct16BitHeader(bmpHeader, camera->xres, camera->yres);
+  server.begin();
+
+  for(int i=0; i<AWAKE_TIME*5; i++) {
+    loop(); // Run the loop for a while before going back to sleep
+  }
+
+  Serial.println("Going to sleep now");
+  delay(1000);
+  Serial.flush(); 
+  esp_deep_sleep_start(); // Go to sleep
+  Serial.println("This will never be printed");
 }
 
-void loop() {
+void loop(){
   // If the switch is interrupted, update the LCD.
   if(intFlag){
     portENTER_CRITICAL(&mux);
     intFlag = false;
     portEXIT_CRITICAL(&mux);
-
+    
     // Update the message to "ON"
     if(cameraOn) {
       tft.fillScreen(TFT_BLACK);
-      tft.setTextSize(10);
       tft.setCursor(120, 100);
-      tft.setTextColor(TFT_WHITE);
       tft.println("ON");
     }
     
     // Update the message to "OFF"
     else {
       tft.fillScreen(TFT_BLACK);
-      tft.setTextSize(10);
       tft.setCursor(100, 100);
-      tft.setTextColor(TFT_WHITE);
       tft.println("OFF");
     }
     
@@ -184,7 +242,8 @@ void loop() {
   }
   serve();
   Serial.println("Served");
-  delay(1000);
+  
+  delay(200);
 }
 
 // Detect interrupt

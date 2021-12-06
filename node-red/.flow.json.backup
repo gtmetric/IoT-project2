@@ -250,7 +250,7 @@
         "type": "function",
         "z": "e6ed8a49.34ead",
         "name": "Message",
-        "func": "msg.headers = {\n    \"Content-Type\": \"multipart/form-data\"\n};\nvar date = new Date().toISOString();\ndate = date.substring(0, 10).replaceAll('-', '.') + '-' + date.substring(11, 16);\nmsg.payload = {\n    \"message\": \"[\"+date+\"] We saw someone. Take a look at the monitor.\\n192.168.1.125\",\n    \"imageFile\": msg.payload.imageFile,\n    \"stickerPackageId\": \"1\",\n    \"stickerId\": \"113\"\n};\n\nreturn msg;",
+        "func": "msg.headers = {\n    \"Content-Type\": \"multipart/form-data\"\n};\nvar date = new Date().toISOString();\ndate = date.substring(0, 10).replaceAll('-', '/') + '-' + date.substring(11, 16);\nmsg.payload = {\n    \"message\": \"[\"+date+\"] We saw someone. Take a look at the monitor.\\n192.168.1.125\",\n    \"imageFile\": msg.payload.imageFile,\n    \"stickerPackageId\": \"1\",\n    \"stickerId\": \"113\"\n};\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",

@@ -36,8 +36,8 @@
         "y": 520,
         "wires": [
             [
-                "963e14d69cfde291",
-                "e0a513ae.0c3ff8"
+                "e0a513ae.0c3ff8",
+                "e90c3838f3dd6c99"
             ]
         ]
     },
@@ -175,8 +175,8 @@
         "drop": true,
         "allowrate": false,
         "outputs": 1,
-        "x": 1200,
-        "y": 520,
+        "x": 780,
+        "y": 680,
         "wires": [
             [
                 "5df59d9495029495"
@@ -197,8 +197,8 @@
         "proxy": "",
         "authType": "bearer",
         "senderr": false,
-        "x": 1050,
-        "y": 680,
+        "x": 770,
+        "y": 840,
         "wires": [
             [
                 "00384d1ff1ad1ed5"
@@ -218,8 +218,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1250,
-        "y": 680,
+        "x": 970,
+        "y": 840,
         "wires": []
     },
     {
@@ -237,8 +237,8 @@
         "checkall": "false",
         "repair": false,
         "outputs": 1,
-        "x": 980,
-        "y": 520,
+        "x": 780,
+        "y": 600,
         "wires": [
             [
                 "bbd25f19cd863ad3"
@@ -256,8 +256,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1040,
-        "y": 600,
+        "x": 760,
+        "y": 760,
         "wires": [
             [
                 "bf3a1ff87f8827ff",
@@ -285,7 +285,7 @@
         "reduceInit": "",
         "reduceInitType": "",
         "reduceFixup": "",
-        "x": 790,
+        "x": 750,
         "y": 520,
         "wires": [
             [
@@ -304,7 +304,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
+        "x": 560,
         "y": 600,
         "wires": [
             [
@@ -354,66 +354,11 @@
                 }
             ]
         },
-        "x": 600,
-        "y": 600,
-        "wires": [
-            [
-                "2e08db6be3854aee"
-            ]
-        ]
-    },
-    {
-        "id": "963e14d69cfde291",
-        "type": "jimp-image",
-        "z": "e6ed8a49.34ead",
-        "name": "",
-        "data": "payload",
-        "dataType": "msg",
-        "ret": "buf",
-        "parameter1": "0.5",
-        "parameter1Type": "num",
-        "parameter2": "RESIZE_NEAREST_NEIGHBOR",
-        "parameter2Type": "resizeMode",
-        "parameter3": "",
-        "parameter3Type": "msg",
-        "parameter4": "",
-        "parameter4Type": "msg",
-        "parameter5": "",
-        "parameter5Type": "msg",
-        "parameter6": "",
-        "parameter6Type": "msg",
-        "parameter7": "",
-        "parameter7Type": "msg",
-        "parameter8": "",
-        "parameter8Type": "msg",
-        "sendProperty": "payload",
-        "sendPropertyType": "msg",
-        "parameterCount": 2,
-        "jimpFunction": "scale",
-        "selectedJimpFunction": {
-            "name": "scale",
-            "fn": "scale",
-            "description": "scale the image by the factor f",
-            "parameters": [
-                {
-                    "name": "f",
-                    "type": "num",
-                    "required": true,
-                    "hint": "f the factor to scale the image by"
-                },
-                {
-                    "name": "mode",
-                    "type": "resizeMode",
-                    "required": false,
-                    "hint": "a scaling method (e.g. Jimp.RESIZE_BEZIER)"
-                }
-            ]
-        },
-        "x": 500,
+        "x": 520,
         "y": 520,
         "wires": [
             [
-                "e90c3838f3dd6c99"
+                "2e08db6be3854aee"
             ]
         ]
     },
@@ -496,8 +441,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1250,
-        "y": 600,
+        "x": 970,
+        "y": 760,
         "wires": []
     }
 ]
